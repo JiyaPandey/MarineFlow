@@ -23,11 +23,12 @@ Our solution is a comprehensive data preprocessing and machine learning pipeline
 | [Technologies Used](#technologies-used)        | Tools and libraries               | Tech stack      |
 | [Folder Structure](#folder-structure)          | Project organization              | File layout     |
 | [Conclusions](#conclusions)                    | Project summary                   | Final thoughts  |
+| [License](#license)                            | MIT License information           | Legal info      |
 
 ## Documentation Links
 
-- **📁 Data Processing Details**: [Click me to go to preprocessing docs](preproc/README.md)
-- **📁 Training Details**: [Click me to go to training docs](train/README.md)
+- **Data Processing Details**: [Click to go to preprocessing docs](preproc/README.md)
+- **Training Details**: [Click to go to training docs](train/README.md)
 
 ## Data Processing
 
@@ -55,24 +56,24 @@ Top predictive features identified through analysis:
 ### Data Preprocessing
 
 - **Location**: `preproc/` folder
-- **Main Script**: `preprocess_data.py` - [Click me to see the code](preproc/preprocess_data.py)
+- **Main Script**: `preprocess_data.py` - [Click to see the code](preproc/preprocess_data.py)
 - **What it does**: Cleans data, converts timestamps, checks for errors, creates basic metrics
 - **Output**: Clean datasets ready for machine learning
-- **Full Guide**: [Click me to go to detailed preprocessing guide](preproc/README.md)
+- **Full Guide**: [Click to go to detailed preprocessing guide](preproc/README.md)
 
-[Click me to go to preprocessing docs](preproc/README.md)
+[Click to go to preprocessing docs](preproc/README.md)
 
 ### Feature Engineering
 
-- **Script**: `feature_engineering.py` - [Click me to see the code](preproc/feature_engineering.py)
+- **Script**: `feature_engineering.py` - [Click to see the code](preproc/feature_engineering.py)
 - **What it does**: Creates new features like efficiency ratios, seasonal patterns, risk scores
-- **Feature Stats**: `feature_documentation.txt` - [Click me to see feature importance](preproc/feature_documentation.txt)
+- **Feature Stats**: `feature_documentation.txt` - [Click to see feature importance](preproc/feature_documentation.txt)
 
 ### Model Training
 
 - **Location**: `train/` folder
 - **Status**: Ready for machine learning models
-- **Guide**: [Click me to go to training docs](train/README.md)
+- **Guide**: [Click to go to training docs](train/README.md)
 
 ## Formulas
 
@@ -140,7 +141,7 @@ In maritime shipping, these calculations help predict when ships will face extra
    - This creates the basic time calculations (voyage duration, NOR processing)
 2. **Run feature engineering**: `python .\preproc\feature_engineering.py`
    - This creates all the efficiency ratios and performance scores
-3. **View the results**: [Click me to see calculated features](preproc/feature_documentation.txt)
+3. **View the results**: [Click to see calculated features](preproc/feature_documentation.txt)
 
 ## Technologies Used
 
@@ -168,6 +169,7 @@ MarineFlow/
 │   └── README.md                         # Preprocessing documentation
 ├── train/                                 # Training folder
 │   └── README.md                         # Training documentation
+├── LICENSE                               # MIT License file
 └── README.md                             # This main project file
 ```
 
@@ -175,21 +177,21 @@ MarineFlow/
 
 #### Original Data
 
-- **Raw Dataset**: [Click me to see original data](preproc/marineflow_demurrage_synth.csv) (600 records, 42 features)
+- **Raw Dataset**: [Click to see original data](preproc/marineflow_demurrage_synth.csv) (600 records, 42 features)
 
 #### Processed Data (After Cleaning & Feature Engineering)
 
-- **Training Data**: [Click me to see training data](preproc/marineflow_train.csv) (416 samples, 47 features)
-- **Validation Data**: [Click me to see validation data](preproc/marineflow_validation.csv) (89 samples, 47 features)
-- **Test Data**: [Click me to see test data](preproc/marineflow_test.csv) (90 samples, 47 features)
+- **Training Data**: [Click to see training data](preproc/marineflow_train.csv) (416 samples, 47 features)
+- **Validation Data**: [Click to see validation data](preproc/marineflow_validation.csv) (89 samples, 47 features)
+- **Test Data**: [Click to see test data](preproc/marineflow_test.csv) (90 samples, 47 features)
 
 #### Documentation & Code
 
-- **Feature Statistics**: [Click me to see feature importance](preproc/feature_documentation.txt)
-- **Processing Code**: [Click me to see cleaning code](preproc/preprocess_data.py)
-- **Feature Engineering Code**: [Click me to see feature creation code](preproc/feature_engineering.py)
-- **Saved Pipeline**: [Click me to see pipeline file](preproc/preprocessing_pipeline.pkl)
-- **Detailed Guide**: [Click me to go to preprocessing guide](preproc/README.md)
+- **Feature Statistics**: [Click to see feature importance](preproc/feature_documentation.txt)
+- **Processing Code**: [Click to see cleaning code](preproc/preprocess_data.py)
+- **Feature Engineering Code**: [Click to see feature creation code](preproc/feature_engineering.py)
+- **Saved Pipeline**: [Click to see pipeline file](preproc/preprocessing_pipeline.pkl)
+- **Detailed Guide**: [Click to go to preprocessing guide](preproc/README.md)
 
 ## How to Run
 
@@ -238,7 +240,7 @@ python .\preproc\feature_engineering.py
 type .\preproc\feature_documentation.txt
 ```
 
-Or [Click me to see the results online](preproc/feature_documentation.txt)
+Or [Click to see the results online](preproc/feature_documentation.txt)
 
 **What you'll see:**
 
@@ -338,3 +340,22 @@ We discovered which factors matter most for predicting extra shipping costs:
 MarineFlow presents a robust and scalable solution for maritime demurrage prediction and operational analysis. By leveraging advanced data preprocessing, feature engineering, and domain-specific analysis, we developed a comprehensive system capable of enhancing maritime operational efficiency and prediction accuracy. The successful implementation of automated data quality checks and feature engineering positions MarineFlow as a valuable tool for improving decision-making in maritime logistics, port operations, and vessel management.
 
 The project's modular design and comprehensive documentation provide a strong foundation for future enhancements and integration with machine learning models for predictive analytics in maritime operations.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### MIT License Summary
+- **Commercial use** - You can use this code in commercial applications
+- **Modification** - You can change and adapt the code
+- **Distribution** - You can share the code with others
+- **Private use** - You can use it for personal projects
+- **Liability** - No warranty provided
+- **Warranty** - Use at your own risk
+
+### What this means for you:
+- **Free to use** - No cost, no restrictions on usage
+- **Give credit** - Just include the original license notice
+- **No takeback** - Once licensed, always licensed under MIT
+
+For the full license text, see [LICENSE](LICENSE) file in the repository.
