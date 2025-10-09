@@ -346,6 +346,7 @@ The project's modular design and comprehensive documentation provide a strong fo
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ### MIT License Summary
+
 - **Commercial use** - You can use this code in commercial applications
 - **Modification** - You can change and adapt the code
 - **Distribution** - You can share the code with others
@@ -354,6 +355,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Warranty** - Use at your own risk
 
 ### What this means for you:
+
 - **Free to use** - No cost, no restrictions on usage
 - **Give credit** - Just include the original license notice
 - **No takeback** - Once licensed, always licensed under MIT
