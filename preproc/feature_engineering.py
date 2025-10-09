@@ -13,6 +13,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import mutual_info_regression, mutual_info_classif
 import pickle
 from datetime import datetime
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -316,4 +324,4 @@ with open('feature_documentation.txt', 'w') as f:
     for idx, row in feature_importance_class.head(10).iterrows():
         f.write(f"{row['feature']}: {row['importance_class']:.4f}\n")
 
-print("Feature engineering pipeline complete!")
+logger.info("Feature engineering pipeline complete!")

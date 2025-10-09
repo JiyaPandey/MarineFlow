@@ -24,8 +24,8 @@ type .\preproc\feature_documentation.txt
 
 ## Quick Navigation
 
-| What You Want to Do | File to Use                      | Quick Access                                                    |
-| ------------------- | -------------------------------- | --------------------------------------------------------------- |
+| What You Want to Do | File to Use                      | Quick Access                                                 |
+| ------------------- | -------------------------------- | ------------------------------------------------------------ |
 | Clean raw data      | `preprocess_data.py`             | [Click to see cleaning code](preprocess_data.py)             |
 | Create new features | `feature_engineering.py`         | [Click to see feature code](feature_engineering.py)          |
 | View feature stats  | `feature_documentation.txt`      | [Click to see feature importance](feature_documentation.txt) |

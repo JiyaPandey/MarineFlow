@@ -157,20 +157,20 @@ The preprocessing pipeline is built using standard Python data science libraries
 
 ```
 MarineFlow/
-├── preproc/                               # Data preprocessing folder
-│   ├── feature_documentation.txt          # Feature analysis and statistics
-│   ├── feature_engineering.py             # Feature creation script
-│   ├── marineflow_demurrage_synth.csv     # Original dataset
-│   ├── marineflow_test.csv               # Test split (90 samples)
-│   ├── marineflow_train.csv              # Training split (416 samples)
-│   ├── marineflow_validation.csv         # Validation split (89 samples)
-│   ├── preprocess_data.py                 # Main data cleaning script
-│   ├── preprocessing_pipeline.pkl         # Saved preprocessing pipeline
-│   └── README.md                         # Preprocessing documentation
-├── train/                                 # Training folder
-│   └── README.md                         # Training documentation
-├── LICENSE                               # MIT License file
-└── README.md                             # This main project file
+  preproc/                               # Data preprocessing folder
+    feature_documentation.txt          # Feature analysis and statistics
+    feature_engineering.py             # Feature creation script
+    marineflow_demurrage_synth.csv     # Original dataset
+    marineflow_test.csv               # Test split (90 samples)
+    marineflow_train.csv              # Training split (416 samples)
+    marineflow_validation.csv         # Validation split (89 samples)
+    preprocess_data.py                 # Main data cleaning script
+    preprocessing_pipeline.pkl         # Saved preprocessing pipeline
+    README.md                         # Preprocessing documentation
+  train/                                 # Training folder
+    README.md                         # Training documentation
+  LICENSE                               # MIT License file
+  README.md                             # This main project file
 ```
 
 ### Quick File Access
