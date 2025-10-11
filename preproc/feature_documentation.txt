@@ -1,98 +1,25 @@
-# MARINEFLOW MARITIME DEMURRAGE PREDICTION - FEATURE DOCUMENTATION
-===============================================================================
-# Project: Maritime vessel demurrage prediction system
-# Purpose: Predict demurrage occurrence and financial impact
-# Dataset: Maritime operations with port efficiency and cargo handling metrics
-===============================================================================
+MARINEFLOW FEATURE ENGINEERING SUMMARY
+==================================================
 
-## DATASET STRUCTURE & TARGET SEPARATION
-----------------------------------------
-CSV Structure (98 total columns):
-- INPUT FEATURES:    Columns 0-95  (96 features)
-- TARGET VARIABLES:  Columns 96-97 (2 targets)
+total_features: 96
+original_features: 42
+engineered_features: 54
+temporal_features: 12
+efficiency_features: 10
+financial_features: 6
+categorical_encoded: 26
+train_samples: 416
+val_samples: 89
+test_samples: 90
 
-### Target Variables (Y) - LAST 2 COLUMNS:
-Column 96: demurrage_flag (Classification Target)
-- Type: Binary (0/1)
-- Description: Whether demurrage occurred
-- Distribution: 61.5% positive cases (256/416 in training)
-- 0 = No demurrage (on-time completion)
-- 1 = Demurrage occurred (vessel delayed)
-
-Column 97: demurrage_amount_usd (Regression Target)  
-- Type: Continuous numeric
-- Description: Financial amount of demurrage charges
-- Range: $-17,306 to $78,828
-- Mean: $7,019 per incident
-- Note: Negative values indicate despatch (early completion bonus)
-
-### How to Extract Features and Targets:
-```python
-import pandas as pd
-df = pd.read_csv('train_data.csv')
-
-# Method 1: Column slicing (recommended)
-X = df.iloc[:, :-2]                    # Features (columns 0-95)
-y_classification = df.iloc[:, -2]      # demurrage_flag
-y_regression = df.iloc[:, -1]          # demurrage_amount_usd
-
-# Method 2: By name
-X = df.drop(['demurrage_flag', 'demurrage_amount_usd'], axis=1)
-y_class = df['demurrage_flag']
-y_reg = df['demurrage_amount_usd']
-```
-
-## FEATURE ENGINEERING SUMMARY
-------------------------------
-Total Features: 96
-- Original Features: 42 (from raw maritime data)
-- Engineered Features: 54 (created through feature engineering)
-
-Feature Categories:
-- Temporal Features: 12 (seasonal, time-based patterns)
-- Operational Efficiency: 10 (port performance, vessel efficiency)
-- Financial/Contract: 6 (rates, terms, commercial aspects)
-- Categorical Encoded: 26 (one-hot + label encoded variables)
-- Numerical Transformed: 42 (scaled, ratios, aggregations)
-
-Dataset Splits (70-15-15 stratified):
-- Training Samples: 416
-- Validation Samples: 89  
-- Test Samples: 90
-
-## DATA LEAKAGE VALIDATION
---------------------------
- NO DATA LEAKAGE DETECTED:
-- Target variables (demurrage_flag, demurrage_amount_usd) are isolated in last 2 columns
-- No target-derived features found in input columns
-- All feature engineering uses only historical/operational data
-- Temporal features use only past information
-
- FEATURES REQUIRING VALIDATION:
-The following features contain domain-specific terms but are LEGITIMATE:
-- laytime_efficiency: Historical operational efficiency ratio
-- avg_prior_demurrage_amt_usd: 6-month historical average (not current case)
-- has_prior_claims: Historical claims indicator (6+ months old)
-- pilot_delay_h: Operational delay (not demurrage calculation input)
-- nor_accepted_delay_h: Notice of Readiness processing time
-
-## TOP PERFORMING FEATURES (Mutual Information Scores)
-------------------------------------------------------
-Rank | Feature Name                    | Importance | Category
------|--------------------------------|------------|------------------
-1    | laytime_efficiency             | 0.3465     | Operational Efficiency
-2    | port_performance_score         | 0.1035     | Port Analytics  
-3    | efficiency_vs_congestion       | 0.1033     | Port Analytics
-4    | load_port_Newcastle            | 0.0767     | Geographic (One-hot)
-5    | port_congestion_index          | 0.0765     | Port Analytics
-6    | total_sof_events               | 0.0491     | Operational Events
-7    | season_quarter_Q2              | 0.0379     | Temporal
-8    | load_port_Santos               | 0.0377     | Geographic (One-hot)
-9    | cp_laytime_basis_Liner_Terms   | 0.0364     | Contract Terms
-10   | sof_hose_connect               | 0.0341     | Operational Events
-
-===============================================================================
-Generated: October 11, 2025
-Last Updated: After comprehensive codebase analysis and validation
-Status: Production Ready - No Data Leakage Detected
-===============================================================================
+Top 10 Most Important Features:
+laytime_efficiency: 0.3465
+efficiency_vs_congestion: 0.1033
+port_performance_score: 0.1022
+port_congestion_index: 0.0761
+cp_weather_clause_WWD: 0.0464
+cargo_type_Diesel: 0.0402
+berth_wait_h: 0.0352
+discharge_port_Qingdao: 0.0338
+prior_claims_6m: 0.0314
+cp_weather_clause_SATSHEX: 0.0308

@@ -30,10 +30,10 @@ DATA_LEAKAGE_COLS = [
 
 # File paths for input and output
 FILE_PATHS = {
-    'input': 'marineflow_demurrage_synth.csv',
-    'train': 'marineflow_train.csv',
-    'validation': 'marineflow_validation.csv',
-    'test': 'marineflow_test.csv',
+    'input': 'csvs/marineflow_demurrage_synth.csv',
+    'train': 'csvs/train_data.csv',
+    'validation': 'csvs/validation_data.csv',
+    'test': 'csvs/test_data.csv',
     'pipeline': 'preprocessing_pipeline.pkl',
     'documentation': 'feature_documentation.txt'
 }

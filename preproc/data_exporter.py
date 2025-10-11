@@ -70,65 +70,20 @@ def save_train_test_splits(X_train_scaled, X_val_scaled, X_test_scaled,
     test_data = pd.concat([X_test_clean, y_class_test, y_reg_test], axis=1)
     
     # Save complete ML-ready datasets
-    train_data.to_csv('train_data.csv', index=False)
-    val_data.to_csv('validation_data.csv', index=False)
-    test_data.to_csv('test_data.csv', index=False)
+    train_data.to_csv(FILE_PATHS['train'], index=False)
+    val_data.to_csv(FILE_PATHS['validation'], index=False)
+    test_data.to_csv(FILE_PATHS['test'], index=False)
     
-    logger.info(f"✅ Training data saved: train_data.csv ({len(train_data)} samples, {len(X_train_clean.columns)} features + 2 targets)")
-    logger.info(f"✅ Validation data saved: validation_data.csv ({len(val_data)} samples, {len(X_val_clean.columns)} features + 2 targets)")
-    logger.info(f"✅ Test data saved: test_data.csv ({len(test_data)} samples, {len(X_test_clean.columns)} features + 2 targets)")
-    
-    # Create a simple usage guide
-    usage_guide = f"""
-# MarineFlow ML-Ready Datasets Usage Guide
-
-## Quick Start for Training:
-```python
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-
-# Load training data
-train_df = pd.read_csv('train_data.csv')
-
-# Separate features and targets
-feature_cols = train_df.columns[:-2]  # All except last 2 columns
-X_train = train_df[feature_cols]
-y_classification = train_df['demurrage_flag']  # Binary classification
-y_regression = train_df['demurrage_amount_usd']  # Regression
-
-# Train model
-model = RandomForestClassifier(random_state=42)
-model.fit(X_train, y_classification)
-```
-
-## Dataset Information:
-- Training samples: {len(train_data)}
-- Validation samples: {len(val_data)}
-- Test samples: {len(test_data)}
-- Features: {len(X_train_clean.columns)} (clean, no data leakage)
-- Targets: 2 (demurrage_flag, demurrage_amount_usd)
-
-## Files Generated:
-- train_data.csv: Complete training dataset (features + targets)
-- validation_data.csv: Complete validation dataset (features + targets)  
-- test_data.csv: Complete test dataset (features + targets)
-
-## Target Variables:
-- demurrage_flag: Binary (0/1) - Classification task
-- demurrage_amount_usd: Continuous - Regression task
-"""
-    
-    with open('ML_USAGE_GUIDE.txt', 'w') as f:
-        f.write(usage_guide)
-    
-    logger.info("📋 Usage guide created: ML_USAGE_GUIDE.txt")
+    logger.info(f"✅ Training data saved: {FILE_PATHS['train']} ({len(train_data)} samples, {len(X_train_clean.columns)} features + 2 targets)")
+    logger.info(f"✅ Validation data saved: {FILE_PATHS['validation']} ({len(val_data)} samples, {len(X_val_clean.columns)} features + 2 targets)")
+    logger.info(f"✅ Test data saved: {FILE_PATHS['test']} ({len(test_data)} samples, {len(X_test_clean.columns)} features + 2 targets)")
     
     return {
         'train_samples': len(train_data),
         'val_samples': len(val_data),
         'test_samples': len(test_data),
         'total_features': len(X_train_clean.columns),
-        'files_created': ['train_data.csv', 'validation_data.csv', 'test_data.csv', 'ML_USAGE_GUIDE.txt']
+        'files_created': ['csvs/train_data.csv', 'csvs/validation_data.csv', 'csvs/test_data.csv']
     }
 
 def save_preprocessing_pipeline(scaler, label_encoders, feature_names, target_names, feature_importance):
