@@ -36,28 +36,28 @@ Our solution is a comprehensive data preprocessing and machine learning pipeline
 
 The pipeline processes maritime operational data with the following characteristics:
 
-- **Total Records**: 600 (after preprocessing: 595)
-- **Features**: 47 total (42 original + 5 engineered)
+- **Total Records**: 600 (after preprocessing: 600)
+- **Features**: 137 total (42 original + 95 engineered)
 - **Target Variable**: Demurrage prediction (flag and amount)
-- **Data Split**: 416 train, 89 validation, 90 test samples
+- **Data Split**: 419 train, 90 validation, 91 test samples
 
 ### Key Features
 
 Top predictive features identified through analysis:
 
-- `overage_hours_chargeable`: 0.6672 importance
-- `laytime_vs_allowed`: 0.3465 importance
-- `pred_risk_score`: 0.1287 importance
+- `laytime_efficiency`: 0.3465 importance
+- `port_performance_score`: 0.1036 importance
 - `efficiency_vs_congestion`: 0.1033 importance
-- `port_performance_score`: 0.1018 importance
+- `port_congestion_index`: 0.0760 importance
+- `weather_severity_High`: 0.0409 importance
 
 ## Components
 
 ### Data Preprocessing
 
 - **Location**: `preproc/` folder
-- **Main Script**: `preprocess_data.py` - [Click to see the code](preproc/preprocess_data.py)
-- **What it does**: Cleans data, converts timestamps, checks for errors, creates basic metrics
+- **Main Script**: `data_main.py` - [Click to see the code](preproc/data_main.py)
+- **What it does**: Orchestrates complete pipeline - cleaning, feature engineering, analysis, and export
 - **Output**: Clean datasets ready for machine learning
 - **Full Guide**: [Click to go to detailed preprocessing guide](preproc/README.md)
 
@@ -65,8 +65,8 @@ Top predictive features identified through analysis:
 
 ### Feature Engineering
 
-- **Script**: `feature_engineering.py` - [Click to see the code](preproc/feature_engineering.py)
-- **What it does**: Creates new features like efficiency ratios, seasonal patterns, risk scores
+- **Script**: `data_feature_eng.py` - [Click to see the code](preproc/data_feature_eng.py)
+- **What it does**: Creates 137 features including efficiency ratios, temporal patterns, and interaction features
 - **Feature Stats**: `feature_documentation.txt` - [Click to see feature importance](preproc/feature_documentation.txt)
 
 ### Model Training
@@ -158,39 +158,47 @@ The preprocessing pipeline is built using standard Python data science libraries
 ```
 MarineFlow/
   preproc/                               # Data preprocessing folder
+    data_main.py                        # Main pipeline orchestrator
+    data_cleaner.py                     # Data cleaning module
+    data_feature_eng.py                 # Feature engineering module
+    data_eda.py                         # Exploratory data analysis
+    data_exporter.py                    # Dataset export module
+    utils.py                            # Logging and utilities
+    config.py                           # Configuration settings
     feature_documentation.txt          # Feature analysis and statistics
-    feature_engineering.py             # Feature creation script
-    marineflow_demurrage_synth.csv     # Original dataset
-    marineflow_test.csv               # Test split (90 samples)
-    marineflow_train.csv              # Training split (416 samples)
-    marineflow_validation.csv         # Validation split (89 samples)
-    preprocess_data.py                 # Main data cleaning script
-    preprocessing_pipeline.pkl         # Saved preprocessing pipeline
-    README.md                         # Preprocessing documentation
-  train/                                 # Training folder
-    README.md                         # Training documentation
-  LICENSE                               # MIT License file
-  README.md                             # This main project file
+    csvs/                              # Generated datasets folder
+      marineflow_demurrage_synth.csv   # Original dataset
+      marineflow_test.csv              # Test split (91 samples)
+      marineflow_train.csv             # Training split (419 samples)
+      marineflow_validation.csv        # Validation split (90 samples)
+    logs/                              # Processing logs (created when pipeline runs)
+    README.md                          # Preprocessing documentation
+  train/                               # Training folder
+    README.md                          # Training documentation
+  .gitignore                           # Git ignore file
+  LICENSE                              # MIT License file
+  README.md                            # This main project file
 ```
 
 ### Quick File Access
 
 #### Original Data
 
-- **Raw Dataset**: [Click to see original data](preproc/marineflow_demurrage_synth.csv) (600 records, 42 features)
+- **Raw Dataset**: [Click to see original data](preproc/csvs/marineflow_demurrage_synth.csv) (600 records, 42 features)
 
 #### Processed Data (After Cleaning & Feature Engineering)
 
-- **Training Data**: [Click to see training data](preproc/marineflow_train.csv) (416 samples, 47 features)
-- **Validation Data**: [Click to see validation data](preproc/marineflow_validation.csv) (89 samples, 47 features)
-- **Test Data**: [Click to see test data](preproc/marineflow_test.csv) (90 samples, 47 features)
+- **Training Data**: [Click to see training data](preproc/csvs/marineflow_train.csv) (419 samples, 137 features)
+- **Validation Data**: [Click to see validation data](preproc/csvs/marineflow_validation.csv) (90 samples, 137 features)
+- **Test Data**: [Click to see test data](preproc/csvs/marineflow_test.csv) (91 samples, 137 features)
 
 #### Documentation & Code
 
 - **Feature Statistics**: [Click to see feature importance](preproc/feature_documentation.txt)
-- **Processing Code**: [Click to see cleaning code](preproc/preprocess_data.py)
-- **Feature Engineering Code**: [Click to see feature creation code](preproc/feature_engineering.py)
-- **Saved Pipeline**: [Click to see pipeline file](preproc/preprocessing_pipeline.pkl)
+- **Main Pipeline**: [Click to see orchestrator code](preproc/data_main.py)
+- **Data Cleaning**: [Click to see cleaning code](preproc/data_cleaner.py)
+- **Feature Engineering**: [Click to see feature creation code](preproc/data_feature_eng.py)
+- **Configuration**: [Click to see settings](preproc/config.py)
 - **Detailed Guide**: [Click to go to preprocessing guide](preproc/README.md)
 
 ## How to Run
@@ -205,36 +213,23 @@ pip install pandas numpy
 
 ### Step 2: Clean and Process the Data
 
-Run this command from the main folder:
+Run this command from the preproc folder:
 
 ```powershell
-python .\preproc\preprocess_data.py
+cd preproc
+python data_main.py
 ```
 
 **What this does:**
 
 - Loads the raw ship data (600 records)
-- Fixes timestamp formats
-- Removes bad data (5 records with invalid dates)
-- Creates basic time calculations
-- Checks data for errors and inconsistencies
-- **Result**: Clean dataset with 595 good records
+- Cleans data using modular `data_cleaner.py`
+- Engineers 137 features using `data_feature_eng.py`
+- Performs analysis using `data_eda.py`
+- Exports datasets using `data_exporter.py`
+- **Result**: Clean datasets with 137 features split into train (419), validation (90), test (91)
 
-### Step 3: Create Advanced Features
-
-```powershell
-python .\preproc\feature_engineering.py
-```
-
-**What this does:**
-
-- Takes the clean data from Step 2
-- Creates 47 total features (42 original + 5 new ones)
-- Calculates efficiency ratios, risk scores, seasonal patterns
-- Splits data into train/validation/test sets
-- **Result**: Ready-to-use datasets for machine learning
-
-### Step 4: View Your Results
+### Step 3: View Your Results
 
 ```powershell
 type .\preproc\feature_documentation.txt
@@ -244,9 +239,9 @@ Or [Click to see the results online](preproc/feature_documentation.txt)
 
 **What you'll see:**
 
-- Top 10 most important features for predicting demurrage
-- Feature categories (temporal, efficiency, financial)
-- Statistics about your processed data
+- Top predictive features for predicting demurrage (137 total features)
+- Feature categories (temporal, efficiency, financial, categorical, interactions)
+- Statistics about your processed data (419 train, 90 validation, 91 test samples)
 
 ## Results & Discoveries
 

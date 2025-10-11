@@ -10,38 +10,43 @@ This module transforms raw maritime operational data into machine learning-ready
 
 ```powershell
 # 1. Install dependencies
-pip install pandas numpy scikit-learn
+pip install pandas numpy scikit-learn matplotlib seaborn
 
-# 2. Run preprocessing (from main MarineFlow folder)
-python .\preproc\preprocess_data.py
-python .\preproc\feature_engineering.py
+# 2. Run complete pipeline (from preproc folder)
+cd preproc
+python data_main.py
 
 # 3. Check results
-type .\preproc\feature_documentation.txt
+dir csvs\        # View generated datasets
+type logs\*.log  # View processing logs
 ```
 
-**Result**: Ready-to-use train/validation/test CSV files with 47 features
+**Result**: Ready-to-use train/validation/test CSV files with 137 engineered features
 
 ## Quick Navigation
 
-| What You Want to Do | File to Use                      | Quick Access                                                 |
-| ------------------- | -------------------------------- | ------------------------------------------------------------ |
-| Clean raw data      | `preprocess_data.py`             | [Click to see cleaning code](preprocess_data.py)             |
-| Create new features | `feature_engineering.py`         | [Click to see feature code](feature_engineering.py)          |
-| View feature stats  | `feature_documentation.txt`      | [Click to see feature importance](feature_documentation.txt) |
-| See original data   | `marineflow_demurrage_synth.csv` | [Click to see raw data](marineflow_demurrage_synth.csv)      |
-| Use training data   | `marineflow_train.csv`           | [Click to see training data](marineflow_train.csv)           |
-| Use validation data | `marineflow_validation.csv`      | [Click to see validation data](marineflow_validation.csv)    |
-| Use test data       | `marineflow_test.csv`            | [Click to see test data](marineflow_test.csv)                |
-| Load saved pipeline | `preprocessing_pipeline.pkl`     | [Click to download pipeline](preprocessing_pipeline.pkl)     |
+| What You Want to Do   | File to Use                           | Quick Access                                                   |
+| --------------------- | ------------------------------------- | -------------------------------------------------------------- |
+| Run complete pipeline | `data_main.py`                        | [Click to see orchestrator code](data_main.py)                 |
+| Clean raw data        | `data_cleaner.py`                     | [Click to see cleaning code](data_cleaner.py)                  |
+| Create new features   | `data_feature_eng.py`                 | [Click to see feature code](data_feature_eng.py)               |
+| Analyze data patterns | `data_eda.py`                         | [Click to see analysis code](data_eda.py)                      |
+| Export datasets       | `data_exporter.py`                    | [Click to see export code](data_exporter.py)                   |
+| Configure settings    | `config.py`                           | [Click to see configuration](config.py)                        |
+| View feature stats    | `feature_documentation.txt`           | [Click to see feature importance](feature_documentation.txt)   |
+| See original data     | `csvs/marineflow_demurrage_synth.csv` | [Click to see raw data](csvs/marineflow_demurrage_synth.csv)   |
+| Use training data     | `csvs/marineflow_train.csv`           | [Click to see training data](csvs/marineflow_train.csv)        |
+| Use validation data   | `csvs/marineflow_validation.csv`      | [Click to see validation data](csvs/marineflow_validation.csv) |
+| Use test data         | `csvs/marineflow_test.csv`            | [Click to see test data](csvs/marineflow_test.csv)             |
+| Check processing logs | `logs/marineflow_*.log`               | [Click to see logs](logs/)                                     |
 
 ## What This Folder Does
 
 This folder takes messy ship data and turns it into clean, ready-to-use datasets for predicting demurrage costs.
 
 **Input**: Raw maritime data (600 records with timestamp errors and missing values)  
-**Output**: Clean datasets split into train/validation/test with 47 engineered features  
-**Processing Time**: ~2-3 minutes for complete pipeline
+**Output**: Clean datasets split into train/validation/test with 137 engineered features  
+**Processing Time**: ~55 seconds for complete modular pipeline
 
 ## Prerequisites
 
@@ -52,49 +57,59 @@ Before running the preprocessing scripts, make sure you have:
 pip install pandas numpy scikit-learn
 ```
 
-**Python Version**: Python 3.7 or higher  
-**Required Libraries**: pandas, numpy, scikit-learn, datetime  
-**Disk Space**: ~50MB for all generated files
+**Python Version**: Python 3.8 or higher  
+**Required Libraries**: pandas, numpy, scikit-learn, matplotlib, seaborn  
+**Disk Space**: ~100MB for all generated files including logs
 
 ## How to Run Everything
 
-### Step 1: Clean the Raw Data
+### Complete Pipeline Execution (Recommended)
 
 ```powershell
-# From the main MarineFlow folder, run:
-python .\preproc\preprocess_data.py
+# Navigate to preproc folder and run complete pipeline
+cd preproc
+python data_main.py
 ```
 
 **What this does:**
 
-- Loads [marineflow_demurrage_synth.csv](marineflow_demurrage_synth.csv) (600 records)
-- Fixes timestamp formats (converts text dates to proper dates)
-- Removes 5 records with impossible timestamps (like arrival before departure)
-- Creates basic time calculations (voyage duration, processing time)
-- Checks all data for errors and inconsistencies
-- **Result**: Clean dataset with 595 good records
+- Loads [csvs/marineflow_demurrage_synth.csv](csvs/marineflow_demurrage_synth.csv) (600 records)
+- Runs [data_cleaner.py](data_cleaner.py) - fixes errors, handles outliers, optimizes data types
+- Runs [data_feature_eng.py](data_feature_eng.py) - creates 137 features from 42 original
+- Runs [data_eda.py](data_eda.py) - generates statistical insights and correlations
+- Runs [data_exporter.py](data_exporter.py) - creates stratified train/val/test splits
+- Creates comprehensive logs in [logs/](logs/) folder (created during execution)
+- **Result**: 3 CSV files in [csvs/](csvs/) folder with 137 features each
 
-### Step 2: Create Advanced Features
+### Step-by-Step Execution (Advanced)
 
 ```powershell
-# From the main MarineFlow folder, run:
-python .\preproc\feature_engineering.py
+cd preproc
+
+# Step 1: Clean the raw data
+python data_cleaner.py
+
+# Step 2: Engineer features
+python data_feature_eng.py
+
+# Step 3: Analyze data
+python data_eda.py
+
+# Step 4: Export datasets
+python data_exporter.py
 ```
-
-**What this does:**
-
-- Takes the clean data from Step 1
-- Creates 47 total features (42 original + 5 new engineered features)
-- Calculates efficiency ratios, risk scores, seasonal patterns
-- Splits data into train (416), validation (89), and test (90) samples
-- Saves everything as separate CSV files
-- **Result**: Ready-to-use datasets for machine learning
 
 ### Step 3: View Your Results
 
 ```powershell
 # See the feature importance and statistics:
-type .\preproc\feature_documentation.txt
+type feature_documentation.txt
+
+# Check generated datasets:
+dir csvs\
+
+# View processing logs (if any):
+dir logs\
 ```
 
 Or [Click to see feature stats online](feature_documentation.txt)
