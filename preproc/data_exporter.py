@@ -1,3 +1,222 @@
+# marineflow_exporter.py
+"""
+MARINEFLOW - dataset export utilities
+
+Provides:
+- split_features_targets(df)
+- create_train_val_test_splits(X, y_flag, y_amount, ...)
+- save_preprocessing_artifacts(splits)
+- export_datasets(df)
+
+Expectations:
+- utils: get_logger, save_csv, save_pickle, ensure_directory
+- config: TARGET_COLS, DATA_LEAKAGE_COLS, FILE_PATHS (optional)
+"""
+
+from typing import Dict, Tuple
+import os
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+from utils import get_logger, save_csv, save_pickle, ensure_directory
+import config
+
+
+logger = get_logger()
+
+
+def split_features_targets(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series, pd.Series]:
+    """
+    Split dataframe into features X and targets y_flag, y_amount.
+
+    Raises:
+        ValueError if required target columns are missing.
+    """
+    required_targets = ['demurrage_flag', 'demurrage_amount_usd']
+    for t in required_targets:
+        if t not in df.columns:
+            raise ValueError(f"Missing required target column: {t}")
+
+    exclude_cols = getattr(config, "TARGET_COLS", []) + getattr(config, "DATA_LEAKAGE_COLS", [])
+    feature_cols = [c for c in df.columns if c not in exclude_cols]
+
+    X = df[feature_cols].copy()
+    y_flag = df['demurrage_flag'].copy()
+    y_amount = df['demurrage_amount_usd'].copy()
+
+    logger.info(f"split_features_targets: features={len(feature_cols)}, X.shape={X.shape}")
+    return X, y_flag, y_amount
+
+
+def create_train_val_test_splits(
+    X: pd.DataFrame,
+    y_flag: pd.Series,
+    y_amount: pd.Series,
+    train_size: float = 0.7,
+    val_size: float = 0.15,
+    random_state: int = 42
+) -> Dict[str, Dict[str, pd.DataFrame]]:
+    """
+    Create train/validation/test splits and return dictionary of splits.
+    Stratifies on y_flag to keep class distribution.
+    """
+    if not (0.0 < train_size < 1.0) or not (0.0 <= val_size < 1.0):
+        raise ValueError("train_size and val_size must be between 0 and 1")
+
+    test_size = 1.0 - train_size - val_size
+    if test_size <= 0:
+        raise ValueError("train_size + val_size must be < 1.0")
+
+    logger.info(f"Creating splits: train={train_size}, val={val_size}, test={test_size}")
+
+    # First split: train vs temp (val+test)
+    X_train, X_temp, y_flag_train, y_flag_temp, y_amount_train, y_amount_temp = train_test_split(
+        X, y_flag, y_amount,
+        test_size=(1.0 - train_size),
+        random_state=random_state,
+        stratify=y_flag
+    )
+
+    # Second split: val vs test from temp
+    # val_ratio is relative portion of temp that should be validation
+    val_ratio = val_size / (val_size + test_size)
+    X_val, X_test, y_flag_val, y_flag_test, y_amount_val, y_amount_test = train_test_split(
+        X_temp, y_flag_temp, y_amount_temp,
+        test_size=(1.0 - val_ratio),
+        random_state=random_state,
+        stratify=y_flag_temp
+    )
+
+    # Reset indices to keep clean alignment when concatenating later
+    def reset_all(*dfs):
+        return [df.reset_index(drop=True) for df in dfs]
+
+    X_train, X_val, X_test = reset_all(X_train, X_val, X_test)
+    y_flag_train, y_flag_val, y_flag_test = reset_all(y_flag_train, y_flag_val, y_flag_test)
+    y_amount_train, y_amount_val, y_amount_test = reset_all(y_amount_train, y_amount_val, y_amount_test)
+
+    splits = {
+        'train': {'X': X_train, 'y_flag': y_flag_train, 'y_amount': y_amount_train},
+        'validation': {'X': X_val, 'y_flag': y_flag_val, 'y_amount': y_amount_val},
+        'test': {'X': X_test, 'y_flag': y_flag_test, 'y_amount': y_amount_test},
+    }
+
+    for split_name, data in splits.items():
+        flag_dist = data['y_flag'].value_counts().to_dict()
+        logger.info(f"{split_name}: samples={len(data['X'])}, flag_dist={flag_dist}")
+
+    return splits
+
+
+def save_preprocessing_artifacts(splits: Dict[str, Dict[str, pd.DataFrame]], artifacts_path: str = 'preprocessing_artifacts.pkl') -> str:
+    """
+    Build and save simple preprocessing artifact summary (pickle).
+    Returns path to saved pickle.
+    """
+    artifacts = {
+        'feature_names': list(splits['train']['X'].columns),
+        'target_names': ['demurrage_flag', 'demurrage_amount_usd'],
+        'split_info': {
+            'train_size': len(splits['train']['X']),
+            'val_size': len(splits['validation']['X']),
+            'test_size': len(splits['test']['X']),
+        },
+        'feature_statistics': {
+            'numeric_features': len(splits['train']['X'].select_dtypes(include=[np.number]).columns),
+            'categorical_features': len(splits['train']['X'].select_dtypes(include=['object', 'category']).columns),
+            'total_features': len(splits['train']['X'].columns)
+        }
+    }
+
+    save_pickle(artifacts, artifacts_path)
+    logger.info(f"Preprocessing artifacts saved: {artifacts_path}")
+    return artifacts_path
+
+
+# Optional placeholders you can implement further if needed:
+def save_preprocessing_pipeline(scaler, label_encoders, feature_names, target_names, feature_importance, out_path: str = None):
+    """
+    Save a preprocessing pipeline dict to disk. If config.FILE_PATHS exists,
+    it can be used to set default path.
+    """
+    pipeline = {
+        'scaler': scaler,
+        'label_encoders': label_encoders,
+        'feature_names': list(feature_names),
+        'target_names': list(target_names),
+        'feature_importance': feature_importance
+    }
+    if out_path is None:
+        out_path = getattr(config, "FILE_PATHS", {}).get('pipeline', 'pipeline.pkl')
+    save_pickle(pipeline, out_path)
+    logger.info(f"Preprocessing pipeline saved: {out_path}")
+    return out_path
+
+
+def create_feature_documentation(dataset_summary: dict, feature_importance: pd.DataFrame, doc_path: str = None) -> str:
+    """
+    Minimal feature documentation writer. Implement richer content if required.
+    """
+    if doc_path is None:
+        doc_path = getattr(config, "FILE_PATHS", {}).get('documentation', 'feature_documentation.txt')
+
+    with open(doc_path, 'w') as f:
+        f.write("MARINEFLOW FEATURE ENGINEERING SUMMARY\n")
+        f.write("=" * 60 + "\n\n")
+        for k, v in dataset_summary.items():
+            f.write(f"{k}: {v}\n")
+        f.write("\nTop features (if provided):\n")
+        if feature_importance is not None and not feature_importance.empty:
+            for _, row in feature_importance.head(20).iterrows():
+                # Expect feature_importance to have columns ['feature', 'importance'] or similar
+                feat = row.get('feature', None) or row.index[0]
+                imp = row.get('importance', row.get('importance_class', None) or row.get('importance_reg', None))
+                f.write(f"{feat}: {imp}\n")
+
+    logger.info(f"Feature documentation created: {doc_path}")
+    return doc_path
+
+
+def export_datasets(df: pd.DataFrame, csv_dir: str = 'csvs') -> Dict[str, dict]:
+    """
+    Export train/validation/test datasets with no data leakage.
+
+    Returns:
+        export_results: dict keyed by split with 'filepath', 'shape', 'features', 'samples'
+    """
+    logger = get_logger()
+    ensure_directory(csv_dir)
+
+    # Split features and targets (this automatically removes data leakage columns)
+    X, y_flag, y_amount = split_features_targets(df)
+
+    # Create splits (train/val/test)
+    splits = create_train_val_test_splits(X, y_flag, y_amount)
+
+    export_results = {}
+    for split_name, data in splits.items():
+        combined_df = data['X'].copy()
+        combined_df['demurrage_flag'] = data['y_flag'].values
+        combined_df['demurrage_amount_usd'] = data['y_amount'].values
+
+        filepath = os.path.join(csv_dir, f'marineflow_{split_name}.csv')
+        save_csv(combined_df, filepath)
+        logger.info(f"Exported {split_name}: {combined_df.shape} -> {filepath}")
+
+        export_results[split_name] = {
+            'filepath': filepath,
+            'shape': combined_df.shape,
+            'features': len(data['X'].columns),
+            'samples': len(combined_df)
+        }
+
+    # Save preprocessing artifacts summary
+    artifacts_path = save_preprocessing_artifacts(splits)
+    export_results['artifacts'] = artifacts_path
+
+    logger.info("Dataset export completed successfully")
+    return export_results
 # =============================================================================
 # MARINEFLOW DATA EXPORTER - SAVE DATASETS AND PIPELINE FUNCTIONS
 # =============================================================================

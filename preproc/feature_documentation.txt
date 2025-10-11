@@ -14,12 +14,12 @@ test_samples: 90
 
 Top 10 Most Important Features:
 laytime_efficiency: 0.3465
+port_performance_score: 0.1036
 efficiency_vs_congestion: 0.1033
-port_performance_score: 0.1022
-port_congestion_index: 0.0761
-cp_weather_clause_WWD: 0.0464
-cargo_type_Diesel: 0.0402
-berth_wait_h: 0.0352
-discharge_port_Qingdao: 0.0338
-prior_claims_6m: 0.0314
-cp_weather_clause_SATSHEX: 0.0308
+port_congestion_index: 0.0760
+weather_severity_High: 0.0409
+cp_weather_clause_SATSHEX: 0.0396
+discharge_port_Singapore: 0.0362
+berth_wait_h: 0.0345
+is_year_end: 0.0315
+total_sof_events: 0.0311
