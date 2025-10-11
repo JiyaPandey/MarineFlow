@@ -4,7 +4,7 @@
 
 ## Overview
 
-This module transforms raw maritime operational data into machine learning-ready datasets. It handles data quality issues, creates domain-specific features, and prepares train/validation/test splits for demurrage prediction models.
+This module transforms raw maritime operational data into machine learning-ready datasets. It handles data quality issues, creates domain-specific features, and prepares train/validation/test splits for demurrage prediction model.
 
 ## Quick Start (TL;DR)
 
