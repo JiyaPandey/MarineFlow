@@ -11,6 +11,7 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import mutual_info_classif
 import logging
+from config import DATA_LEAKAGE_COLS, TARGET_COLS
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -108,7 +109,7 @@ def create_operational_features(df):
 
 def create_financial_features(df):
     """
-    Create financial and performance-related features
+    Create financial and performance-related features (NO DATA LEAKAGE)
     
     Args:
         df (pd.DataFrame): Input dataset
@@ -120,22 +121,25 @@ def create_financial_features(df):
     logger.info("SECTION 4: FINANCIAL AND PERFORMANCE FEATURES")
     logger.info("="*50)
     
-    # Rate efficiency
-    df['demurrage_rate_efficiency'] = df['demurrage_rate_usd_per_day'] / df['demurrage_rate_usd_per_day'].median()
-    
-    # Historical performance indicators
+    # Historical performance indicators (safe - no target leakage)
     df['has_prior_claims'] = (df['prior_claims_6m'] > 0).astype(int)
     df['prior_claim_frequency'] = df['prior_claims_6m'] / 6  # claims per month
     
-    # Charterer performance 
-    charterer_avg_demurrage = df.groupby('charterer')['demurrage_amount_usd'].mean()
-    df['charterer_avg_demurrage'] = df['charterer'].map(charterer_avg_demurrage)
-    
-    # Performance ratios
+    # Performance ratios (safe - no target leakage)
     df['efficiency_vs_congestion'] = df['port_efficiency_index'] / (df['port_congestion_index'] + 1)
-    df['laytime_vs_allowed'] = df['used_laytime_h'] / df['allowed_laytime_h']
     
-    logger.info("Financial features created successfully!")
+    # Binary flags for operational exclusions (safe)
+    if 'rain_excluded_from_laytime' in df.columns:
+        df['rain_excluded_flag'] = (df['rain_excluded_from_laytime'] > 0).astype(int)
+    if 'strike_excluded_from_laytime' in df.columns:
+        df['strike_excluded_flag'] = (df['strike_excluded_from_laytime'] > 0).astype(int)
+    
+    # NOTE: Removed the following features to prevent data leakage:
+    # - demurrage_rate_efficiency (uses demurrage_rate_usd_per_day - target related)
+    # - charterer_avg_demurrage (uses demurrage_amount_usd - target variable)
+    # - laytime_vs_allowed (derived from overage calculations - leakage)
+    
+    logger.info("Financial features created successfully (data leakage removed)!")
     return df
 
 def encode_categorical_features(df):
@@ -190,12 +194,6 @@ def encode_categorical_features(df):
             # Drop original column
             df.drop(col, axis=1, inplace=True)
     
-    # Create binary flags for operational indicators (if columns exist)
-    if 'rain_excluded_from_laytime' in df.columns:
-        df['rain_excluded_flag'] = (df['rain_excluded_from_laytime'] > 0).astype(int)
-    if 'strike_excluded_from_laytime' in df.columns:
-        df['strike_excluded_flag'] = (df['strike_excluded_from_laytime'] > 0).astype(int)
-    
     logger.info(f"Encoded {len(one_hot_cols)} columns with one-hot encoding")
     logger.info(f"Encoded {len(label_encode_cols)} columns with label encoding")
     
@@ -218,8 +216,9 @@ def select_features_and_analyze_correlation(df):
     # Get numeric columns for correlation analysis
     numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
     
-    # Remove target variables from feature correlation analysis
-    feature_cols = [col for col in numeric_cols if col not in ['demurrage_flag', 'demurrage_amount_usd']]
+    # Remove target variables and data leakage columns from feature correlation analysis
+    feature_cols = [col for col in numeric_cols 
+                   if col not in TARGET_COLS and col not in DATA_LEAKAGE_COLS]
     
     # Calculate correlation matrix
     correlation_matrix = df[feature_cols].corr()
@@ -252,8 +251,8 @@ def select_features_and_analyze_correlation(df):
     
     # Calculate feature importance using mutual information
     final_feature_cols = [col for col in df.columns 
-                         if col not in ['demurrage_flag', 'demurrage_amount_usd', 'voyage_id'] 
-                         and df[col].dtype in ['int64', 'float64']]
+                         if col not in TARGET_COLS + DATA_LEAKAGE_COLS + ['voyage_id']
+                         and df[col].dtype in ['int64', 'float64', 'bool']]
     
     # Mutual information for classification (demurrage_flag)
     mi_class = mutual_info_classif(df[final_feature_cols].fillna(0), df['demurrage_flag'])
@@ -281,10 +280,30 @@ def prepare_train_test_split(df, final_feature_cols):
     logger.info("SECTION 7: DATA PREPARATION AND TRAIN-TEST SPLIT")
     logger.info("="*50)
     
-    # Final feature matrix
-    X = df[final_feature_cols].fillna(0)
-    y_classification = df['demurrage_flag']
-    y_regression = df['demurrage_amount_usd']
+    # Final feature matrix with proper missing value handling
+    X = df[final_feature_cols].copy()
+    
+    # Handle missing values more robustly
+    if X.isnull().sum().sum() > 0:
+        logger.warning(f"Found {X.isnull().sum().sum()} missing values, filling with 0")
+        X = X.fillna(0)
+    
+    # Ensure all columns are numeric and handle infinite values
+    for col in X.columns:
+        if X[col].dtype == 'object':
+            logger.warning(f"Converting non-numeric column {col} to numeric")
+            X[col] = pd.to_numeric(X[col], errors='coerce').fillna(0)
+    
+    # Check for infinite values only on numeric columns
+    numeric_cols = X.select_dtypes(include=[np.number]).columns
+    if len(numeric_cols) > 0:
+        inf_count = np.isinf(X[numeric_cols].values).sum()
+        if inf_count > 0:
+            logger.warning(f"Found {inf_count} infinite values, replacing with 0")
+            X[numeric_cols] = X[numeric_cols].replace([np.inf, -np.inf], 0)
+    
+    y_classification = df['demurrage_flag'].copy()
+    y_regression = df['demurrage_amount_usd'].copy()
     
     # Train-validation-test split (70-15-15)
     # First split: 70% train, 30% temp
@@ -312,7 +331,7 @@ def prepare_train_test_split(df, final_feature_cols):
 
 def scale_features(X_train, X_val, X_test):
     """
-    Apply standard scaling to feature sets
+    Apply standard scaling to feature sets with proper index handling
     
     Args:
         X_train, X_val, X_test: Feature matrices
@@ -324,17 +343,26 @@ def scale_features(X_train, X_val, X_test):
     logger.info("SECTION 8: SCALING AND PREPROCESSING PIPELINE")
     logger.info("="*50)
     
+    # Store original column names
+    feature_names = X_train.columns.tolist()
+    
+    # Fit scaler on training data only
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_val_scaled = scaler.transform(X_val)
     X_test_scaled = scaler.transform(X_test)
     
-    # Convert back to DataFrames with feature names
-    X_train_scaled = pd.DataFrame(X_train_scaled, columns=X_train.columns, index=X_train.index)
-    X_val_scaled = pd.DataFrame(X_val_scaled, columns=X_val.columns, index=X_val.index)
-    X_test_scaled = pd.DataFrame(X_test_scaled, columns=X_test.columns, index=X_test.index)
+    # Convert back to DataFrames with clean indices to prevent alignment issues
+    X_train_scaled = pd.DataFrame(X_train_scaled, columns=feature_names)
+    X_val_scaled = pd.DataFrame(X_val_scaled, columns=feature_names)
+    X_test_scaled = pd.DataFrame(X_test_scaled, columns=feature_names)
     
-    logger.info("Feature scaling complete!")
+    # Reset indices to ensure clean sequential numbering
+    X_train_scaled = X_train_scaled.reset_index(drop=True)
+    X_val_scaled = X_val_scaled.reset_index(drop=True)
+    X_test_scaled = X_test_scaled.reset_index(drop=True)
+    
+    logger.info("Feature scaling complete with clean indices!")
     
     return scaler, X_train_scaled, X_val_scaled, X_test_scaled
 

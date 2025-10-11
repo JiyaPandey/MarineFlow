@@ -18,6 +18,16 @@ NUMERIC_COLS = [
 # Target columns for prediction
 TARGET_COLS = ['demurrage_flag', 'demurrage_amount_usd']
 
+# Data leakage columns that should NEVER be used as features
+DATA_LEAKAGE_COLS = [
+    'overage_hours_chargeable',  # Directly derived from target calculation
+    'laytime_vs_allowed',        # Ratio that reveals overage status
+    'demurrage_amount_usd',      # Target variable itself
+    'demurrage_rate_usd_per_day', # Used in target calculation
+    'demurrage_flag',            # Target variable itself
+    'pred_risk_score'            # Any prediction-based score
+]
+
 # File paths for input and output
 FILE_PATHS = {
     'input': 'marineflow_demurrage_synth.csv',
