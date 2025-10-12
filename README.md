@@ -12,7 +12,7 @@ Our solution is a comprehensive data preprocessing and machine learning pipeline
 
 ## System Architecture
 
-![MarineFlow Architecture](preproc/assets/MarineFlow%20Logical%20Architecture.jpg)
+![MarineFlow Architecture](preproc/assets/MarineFlow_Architecture.jpg)
 
 ### Architecture Overview
 
