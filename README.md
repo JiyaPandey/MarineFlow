@@ -10,10 +10,48 @@ Maritime operations face significant challenges in predicting demurrage costs an
 
 Our solution is a comprehensive data preprocessing and machine learning pipeline designed for maritime demurrage prediction and flow analysis. It utilizes advanced feature engineering and statistical analysis to process maritime operational data including vessel timestamps, port efficiency metrics, weather conditions, and cargo handling information. By automating data preprocessing and providing predictive insights, our pipeline enhances operational efficiency, reduces prediction errors, and improves decision-making. The modular design allows for seamless integration into existing maritime workflows and adaptability to different port operations.
 
+## System Architecture
+
+![MarineFlow Architecture](preproc/assets/MarineFlow%20Logical%20Architecture.jpg)
+
+### Architecture Overview
+
+The MarineFlow pipeline follows a **4-layer architecture** designed for scalability, maintainability, and data integrity:
+
+#### **Layer 1 — Data Layer**
+- **Raw CSV Data**: Maritime operational datasets (`marineflow_demurrage_synth.csv`)
+- **Configuration Files**: Centralized settings (`config.py`)
+- **Metadata**: Feature documentation and data schemas
+
+#### **Layer 2 — Processing Layer** 
+- **Data Cleaning**: Quality assurance and preprocessing (`data_cleaner.py`)
+- **Feature Engineering**: Advanced feature creation from raw data (`data_feature_eng.py`)
+- **EDA**: Exploratory data analysis and validation (`data_eda.py`)
+- **Utils**: Shared utilities for logging and validation (`utils.py`)
+
+#### **Layer 3 — Orchestration Layer**
+- **Pipeline Control**: End-to-end workflow management (`data_main.py`)
+- **Configuration Loading**: Centralized parameter management
+- **Error Handling**: Robust exception management and logging
+
+#### **Layer 4 — Output Layer**
+- **Train/Validation/Test Split**: Stratified dataset preparation (`data_exporter.py`)
+- **Reports**: Feature importance and analysis reports
+- **Logs**: Comprehensive execution logging for debugging
+
+### Key Architecture Benefits
+
+- **Modularity**: Each layer can be modified independently
+- **Data Integrity**: Prevents data leakage through proper separation
+- **Scalability**: Easy to add new features or processing steps
+- **Maintainability**: Clear separation of concerns and responsibilities
+- **Auditability**: Complete logging and validation at each stage
+
 ## Table of Contents
 
 | Section                                        | Description                       | Quick Access    |
 | ---------------------------------------------- | --------------------------------- | --------------- |
+| [System Architecture](#system-architecture)    | Pipeline architecture diagram     | View architecture |
 | [Documentation Links](#documentation-links)    | Links to detailed module docs     | Jump to docs    |
 | [Data Processing](#data-processing)            | Dataset overview and key features | See data info   |
 | [Components](#components)                      | Project modules and scripts       | View components |

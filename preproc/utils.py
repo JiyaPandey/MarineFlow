@@ -30,9 +30,9 @@ def check_logs_directory():
     
     if not os.path.exists(logs_dir):
         os.makedirs(logs_dir)
-        print(f"📁 Created logs directory: {logs_dir}")
+        print(f" Created logs directory: {logs_dir}")
     else:
-        print(f"📁 Logs directory exists: {logs_dir}")
+        print(f" Logs directory exists: {logs_dir}")
     
     return logs_dir
 
@@ -61,10 +61,10 @@ def setup_logging(log_level='INFO', custom_filename=None):
     
     # 3. Check if log file exists
     if os.path.exists(log_filepath):
-        print(f"📄 Log file exists - will append to: {log_filename}")
+        print(f" Log file exists - will append to: {log_filename}")
         file_mode = 'a'  # Append mode
     else:
-        print(f"📄 Creating new log file: {log_filename}")
+        print(f" Creating new log file: {log_filename}")
         file_mode = 'w'  # Write mode
     
     # 4. Configure logging

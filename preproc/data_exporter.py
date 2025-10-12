@@ -196,19 +196,24 @@ def export_datasets(df: pd.DataFrame, csv_dir: str = 'csvs') -> Dict[str, dict]:
 
     export_results = {}
     for split_name, data in splits.items():
+        # Create combined dataset (features + targets) as you designed
         combined_df = data['X'].copy()
         combined_df['demurrage_flag'] = data['y_flag'].values
         combined_df['demurrage_amount_usd'] = data['y_amount'].values
-
+        
+        # Save the combined file (your preferred format)
         filepath = os.path.join(csv_dir, f'marineflow_{split_name}.csv')
         save_csv(combined_df, filepath)
         logger.info(f"Exported {split_name}: {combined_df.shape} -> {filepath}")
+        logger.info(f"  Features: columns 0-{len(data['X'].columns)-1} | Targets: columns {len(data['X'].columns)}-{len(combined_df.columns)-1}")
 
         export_results[split_name] = {
             'filepath': filepath,
             'shape': combined_df.shape,
             'features': len(data['X'].columns),
-            'samples': len(combined_df)
+            'samples': len(combined_df),
+            'feature_columns': f"0-{len(data['X'].columns)-1}",
+            'target_columns': f"{len(data['X'].columns)}-{len(combined_df.columns)-1}"
         }
 
     # Save preprocessing artifacts summary
