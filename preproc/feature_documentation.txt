@@ -23,3 +23,17 @@ discharge_port_Singapore: 0.0362
 berth_wait_h: 0.0345
 is_year_end: 0.0315
 total_sof_events: 0.0311
+
+DATA STRUCTURE DETAILS
+==================================================
+
+Input Features (Columns 0–134):
+All operational, efficiency, temporal, categorical, and weather-based variables used for model training.
+
+Target Variables (Columns 135–136):
+• demurrage_flag — Binary classification target (0 or 1)  
+• demurrage_amount_usd — Continuous regression target (USD value)
+
+Data Leakage Prevention:
+All derived columns directly dependent on target variables (e.g., overage_hours_chargeable, laytime_vs_allowed, demurrage_rate_usd_per_day) were **removed** to ensure clean model training and evaluation integrity.
+
