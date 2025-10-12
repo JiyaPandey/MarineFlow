@@ -12,7 +12,6 @@ Our solution is a comprehensive data preprocessing and machine learning pipeline
 
 ## System Architecture
 
-![MarineFlow Architecture](preproc/assets/MarineFlow_Architecture.jpg)
 <img width="1652" height="945" alt="image" src="https://github.com/user-attachments/assets/52477163-2e1f-4335-a8d6-5ca42dbc6896" />
 
 
