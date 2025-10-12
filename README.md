@@ -19,22 +19,26 @@ Our solution is a comprehensive data preprocessing and machine learning pipeline
 The MarineFlow pipeline follows a **4-layer architecture** designed for scalability, maintainability, and data integrity:
 
 #### **Layer 1 — Data Layer**
+
 - **Raw CSV Data**: Maritime operational datasets (`marineflow_demurrage_synth.csv`)
 - **Configuration Files**: Centralized settings (`config.py`)
 - **Metadata**: Feature documentation and data schemas
 
-#### **Layer 2 — Processing Layer** 
+#### **Layer 2 — Processing Layer**
+
 - **Data Cleaning**: Quality assurance and preprocessing (`data_cleaner.py`)
 - **Feature Engineering**: Advanced feature creation from raw data (`data_feature_eng.py`)
 - **EDA**: Exploratory data analysis and validation (`data_eda.py`)
 - **Utils**: Shared utilities for logging and validation (`utils.py`)
 
 #### **Layer 3 — Orchestration Layer**
+
 - **Pipeline Control**: End-to-end workflow management (`data_main.py`)
 - **Configuration Loading**: Centralized parameter management
 - **Error Handling**: Robust exception management and logging
 
 #### **Layer 4 — Output Layer**
+
 - **Train/Validation/Test Split**: Stratified dataset preparation (`data_exporter.py`)
 - **Reports**: Feature importance and analysis reports
 - **Logs**: Comprehensive execution logging for debugging
@@ -49,19 +53,19 @@ The MarineFlow pipeline follows a **4-layer architecture** designed for scalabil
 
 ## Table of Contents
 
-| Section                                        | Description                       | Quick Access    |
-| ---------------------------------------------- | --------------------------------- | --------------- |
+| Section                                        | Description                       | Quick Access      |
+| ---------------------------------------------- | --------------------------------- | ----------------- |
 | [System Architecture](#system-architecture)    | Pipeline architecture diagram     | View architecture |
-| [Documentation Links](#documentation-links)    | Links to detailed module docs     | Jump to docs    |
-| [Data Processing](#data-processing)            | Dataset overview and key features | See data info   |
-| [Components](#components)                      | Project modules and scripts       | View components |
-| [Formulas](#formulas)                          | Mathematical calculations used    | See formulas    |
-| [How to Run](#how-to-run)                      | Step-by-step instructions         | Run the code    |
-| [Results & Discoveries](#results--discoveries) | Key findings and insights         | See results     |
-| [Technologies Used](#technologies-used)        | Tools and libraries               | Tech stack      |
-| [Folder Structure](#folder-structure)          | Project organization              | File layout     |
-| [Conclusions](#conclusions)                    | Project summary                   | Final thoughts  |
-| [License](#license)                            | MIT License information           | Legal info      |
+| [Documentation Links](#documentation-links)    | Links to detailed module docs     | Jump to docs      |
+| [Data Processing](#data-processing)            | Dataset overview and key features | See data info     |
+| [Components](#components)                      | Project modules and scripts       | View components   |
+| [Formulas](#formulas)                          | Mathematical calculations used    | See formulas      |
+| [How to Run](#how-to-run)                      | Step-by-step instructions         | Run the code      |
+| [Results & Discoveries](#results--discoveries) | Key findings and insights         | See results       |
+| [Technologies Used](#technologies-used)        | Tools and libraries               | Tech stack        |
+| [Folder Structure](#folder-structure)          | Project organization              | File layout       |
+| [Conclusions](#conclusions)                    | Project summary                   | Final thoughts    |
+| [License](#license)                            | MIT License information           | Legal info        |
 
 ## Documentation Links
 
