@@ -6,7 +6,7 @@
 # =============================================================================
 
 # Raw data file path
-RAW_DATA_PATH = 'csvs/marineflow_demurrage_synth.csv'
+RAW_DATA_PATH = 'preproc\csvs\synth_data_new_mf.csv'
 
 # Timestamp columns that need datetime conversion
 TIMESTAMP_COLS = ['depart_ts', 'arrival_ts', 'nor_tender_ts', 'nor_accepted_ts']
